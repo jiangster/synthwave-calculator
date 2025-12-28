@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Synthwave Pixel Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(180deg,
+        #ff6b35 0%,
+        #f7418c 20%,
+        #c724b1 40%,
+        #6b2d9c 60%,
+        #1a1a3e 80%,
+        #0d0d1a 100%);
+      font-family: 'Press Start 2P', cursive;
+      overflow: hidden;
+    }
+
+    /* Synthwave pixel stars */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, #0ff, transparent),
+        radial-gradient(2px 2px at 40px 70px, #f0f, transparent),
+        radial-gradient(2px 2px at 90px 40px, #0ff, transparent),
+        radial-gradient(2px 2px at 160px 120px, #ff6ec7, transparent),
+        radial-gradient(2px 2px at 230px 80px, #0ff, transparent),
+        radial-gradient(2px 2px at 300px 150px, #f0f, transparent),
+        radial-gradient(2px 2px at 350px 200px, #ff6ec7, transparent),
+        radial-gradient(2px 2px at 420px 60px, #0ff, transparent);
+      background-size: 500px 300px;
+      animation: twinkle 3s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grid horizon */
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40%;
+      background:
+        linear-gradient(transparent 0%, rgba(255, 0, 255, 0.1) 100%),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 60px,
+          rgba(255, 0, 255, 0.3) 60px,
+          rgba(255, 0, 255, 0.3) 62px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 40px,
+          rgba(0, 255, 255, 0.2) 40px,
+          rgba(0, 255, 255, 0.2) 42px
+        );
+      transform: perspective(200px) rotateX(60deg);
+      transform-origin: bottom;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .calculator {
+      position: relative;
+      background: linear-gradient(145deg, #2a1a3e 0%, #1a0a2e 50%, #0d0518 100%);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow:
+        0 0 0 2px #ff00ff44,
+        0 0 20px #ff00ff66,
+        0 0 40px #ff00ff33,
+        0 0 60px #00ffff22,
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 100, 255, 0.2);
+      z-index: 1;
+    }
+
+    /* Calculator brand */
+    .brand {
+      color: #ff6ec7;
+      font-size: 8px;
+      margin-bottom: 15px;
+      text-shadow: 0 0 10px #ff6ec7, 0 0 20px #ff00ff;
+      letter-spacing: 2px;
+    }
+
+    .model {
+      color: #0ff;
+      font-size: 6px;
+      margin-top: 4px;
+      text-shadow: 0 0 5px #0ff;
+    }
+
+    /* Display */
+    .display-container {
+      position: relative;
+      background: #1a0a2e;
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 20px;
+      box-shadow:
+        inset 0 4px 10px rgba(0, 0, 0, 0.8),
+        0 0 10px rgba(0, 255, 255, 0.3);
+    }
+
+    .display {
+      position: relative;
+      background: linear-gradient(180deg, #1a0a3e 0%, #0d0520 100%);
+      border-radius: 4px;
+      padding: 15px 20px;
+      width: 280px;
+      height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    /* CRT Scanlines */
+    .display::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 0, 255, 0.1) 2px,
+        rgba(255, 0, 255, 0.1) 4px
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* CRT glow */
+    .display::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(100, 0, 150, 0.3) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .display-text {
+      position: relative;
+      color: #0ff;
+      font-size: 28px;
+      text-shadow:
+        0 0 10px #0ff,
+        0 0 20px #0ff,
+        0 0 40px #00aaaa;
+      z-index: 3;
+      width: 240px;
+      text-align: right;
+      overflow: hidden;
+      text-overflow: clip;
+      white-space: nowrap;
+    }
+
+    .display-expression {
+      position: relative;
+      color: #ff6ec7;
+      font-size: 12px;
+      margin-bottom: 8px;
+      z-index: 3;
+      opacity: 0.9;
+      text-shadow: 0 0 5px #ff6ec7;
+    }
+
+    /* Button grid */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .btn {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 14px;
+      padding: 18px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.1s;
+      position: relative;
+      text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    /* Number buttons - cyan neon */
+    .btn-num {
+      background: linear-gradient(145deg, #1a1a3e 0%, #0d0d2a 100%);
+      color: #0ff;
+      border: 2px solid #0ff;
+      box-shadow:
+        0 4px 0 #0a0a1a,
+        0 0 10px rgba(0, 255, 255, 0.3),
+        inset 0 1px 0 rgba(0, 255, 255, 0.1);
+      text-shadow: 0 0 5px #0ff;
+    }
+
+    .btn-num:hover {
+      background: linear-gradient(145deg, #2a2a4e 0%, #1a1a3a 100%);
+      box-shadow:
+        0 4px 0 #0a0a1a,
+        0 0 20px rgba(0, 255, 255, 0.5),
+        inset 0 1px 0 rgba(0, 255, 255, 0.2);
+    }
+
+    .btn-num:active {
+      transform: translateY(4px);
+      box-shadow:
+        0 0 0 #0a0a1a,
+        0 0 15px rgba(0, 255, 255, 0.4),
+        inset 0 1px 0 rgba(0, 255, 255, 0.1);
+    }
+
+    /* Operator buttons - pink/magenta neon */
+    .btn-op {
+      background: linear-gradient(145deg, #2a1a3e 0%, #1a0a2e 100%);
+      color: #ff6ec7;
+      border: 2px solid #ff6ec7;
+      box-shadow:
+        0 4px 0 #1a0a1a,
+        0 0 10px rgba(255, 110, 199, 0.3),
+        inset 0 1px 0 rgba(255, 110, 199, 0.1);
+      text-shadow: 0 0 5px #ff6ec7;
+    }
+
+    .btn-op:hover {
+      background: linear-gradient(145deg, #3a2a4e 0%, #2a1a3e 100%);
+      box-shadow:
+        0 4px 0 #1a0a1a,
+        0 0 20px rgba(255, 110, 199, 0.5),
+        inset 0 1px 0 rgba(255, 110, 199, 0.2);
+    }
+
+    .btn-op:active {
+      transform: translateY(4px);
+      box-shadow:
+        0 0 0 #1a0a1a,
+        0 0 15px rgba(255, 110, 199, 0.4),
+        inset 0 1px 0 rgba(255, 110, 199, 0.1);
+    }
+
+    /* Function buttons - purple neon */
+    .btn-func {
+      background: linear-gradient(145deg, #2a1a4a 0%, #1a0a3a 100%);
+      color: #a855f7;
+      border: 2px solid #a855f7;
+      box-shadow:
+        0 4px 0 #0a0a2a,
+        0 0 10px rgba(168, 85, 247, 0.3),
+        inset 0 1px 0 rgba(168, 85, 247, 0.1);
+      text-shadow: 0 0 5px #a855f7;
+    }
+
+    .btn-func:hover {
+      background: linear-gradient(145deg, #3a2a5a 0%, #2a1a4a 100%);
+      box-shadow:
+        0 4px 0 #0a0a2a,
+        0 0 20px rgba(168, 85, 247, 0.5),
+        inset 0 1px 0 rgba(168, 85, 247, 0.2);
+    }
+
+    .btn-func:active {
+      transform: translateY(4px);
+      box-shadow:
+        0 0 0 #0a0a2a,
+        0 0 15px rgba(168, 85, 247, 0.4),
+        inset 0 1px 0 rgba(168, 85, 247, 0.1);
+    }
+
+    /* Clear button - orange neon */
+    .btn-clear {
+      background: linear-gradient(145deg, #3a1a1a 0%, #2a0a0a 100%);
+      color: #ff6b35;
+      border: 2px solid #ff6b35;
+      box-shadow:
+        0 4px 0 #1a0a0a,
+        0 0 10px rgba(255, 107, 53, 0.3),
+        inset 0 1px 0 rgba(255, 107, 53, 0.1);
+      text-shadow: 0 0 5px #ff6b35;
+    }
+
+    .btn-clear:hover {
+      background: linear-gradient(145deg, #4a2a2a 0%, #3a1a1a 100%);
+      box-shadow:
+        0 4px 0 #1a0a0a,
+        0 0 20px rgba(255, 107, 53, 0.5),
+        inset 0 1px 0 rgba(255, 107, 53, 0.2);
+    }
+
+    .btn-clear:active {
+      transform: translateY(4px);
+      box-shadow:
+        0 0 0 #1a0a0a,
+        0 0 15px rgba(255, 107, 53, 0.4),
+        inset 0 1px 0 rgba(255, 107, 53, 0.1);
+    }
+
+    /* Zero button spans 2 columns */
+    .btn-zero {
+      grid-column: span 2;
+    }
+
+    /* Equals button - bright cyan glow */
+    .btn-equals {
+      background: linear-gradient(145deg, #0a3a3a 0%, #052a2a 100%);
+      color: #0ff;
+      border: 2px solid #0ff;
+      box-shadow:
+        0 4px 0 #021a1a,
+        0 0 15px rgba(0, 255, 255, 0.4),
+        0 0 30px rgba(0, 255, 255, 0.2),
+        inset 0 1px 0 rgba(0, 255, 255, 0.2);
+      text-shadow: 0 0 10px #0ff;
+    }
+
+    .btn-equals:hover {
+      background: linear-gradient(145deg, #0a4a4a 0%, #053a3a 100%);
+      box-shadow:
+        0 4px 0 #021a1a,
+        0 0 25px rgba(0, 255, 255, 0.6),
+        0 0 40px rgba(0, 255, 255, 0.3),
+        inset 0 1px 0 rgba(0, 255, 255, 0.3);
+    }
+
+    .btn-equals:active {
+      transform: translateY(4px);
+      box-shadow:
+        0 0 0 #021a1a,
+        0 0 20px rgba(0, 255, 255, 0.5),
+        0 0 35px rgba(0, 255, 255, 0.25),
+        inset 0 1px 0 rgba(0, 255, 255, 0.2);
+    }
+
+    /* Animations */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px) translateY(-2px); }
+      50% { transform: translateX(4px) translateY(2px); }
+      75% { transform: translateX(-4px) translateY(-2px); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes glitch {
+      0% {
+        transform: translateX(0);
+        filter: hue-rotate(0deg);
+      }
+      20% {
+        transform: translateX(-3px);
+        filter: hue-rotate(90deg);
+      }
+      40% {
+        transform: translateX(3px);
+        filter: hue-rotate(-90deg);
+      }
+      60% {
+        transform: translateX(-2px);
+        filter: hue-rotate(180deg);
+      }
+      80% {
+        transform: translateX(2px);
+        filter: hue-rotate(-180deg);
+      }
+      100% {
+        transform: translateX(0);
+        filter: hue-rotate(0deg);
+      }
+    }
+
+    @keyframes screenOn {
+      0% {
+        opacity: 0;
+        transform: scaleY(0.01);
+      }
+      50% {
+        opacity: 1;
+        transform: scaleY(0.01);
+      }
+      100% {
+        opacity: 1;
+        transform: scaleY(1);
+      }
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .display.shake {
+      animation: shake 0.15s steps(3) 1;
+    }
+
+    .display.bounce {
+      animation: bounce 0.2s steps(2) 1;
+    }
+
+    .display.glitch {
+      animation: glitch 0.3s steps(5) 1;
+    }
+
+    .display.screen-on {
+      animation: screenOn 0.5s ease-out 1;
+    }
+
+    .display.flicker {
+      animation: flicker 0.1s steps(2) 2;
+    }
+
+    /* Calculator body shake - big dramatic shake for calculations */
+    @keyframes calculatorShake {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      10% { transform: translateX(-10px) translateY(-3px) rotate(-2deg); }
+      20% { transform: translateX(10px) translateY(2px) rotate(2deg); }
+      30% { transform: translateX(-8px) translateY(-2px) rotate(-1.5deg); }
+      40% { transform: translateX(8px) translateY(2px) rotate(1.5deg); }
+      50% { transform: translateX(-6px) translateY(-1px) rotate(-1deg); }
+      60% { transform: translateX(6px) translateY(1px) rotate(1deg); }
+      70% { transform: translateX(-4px) rotate(-0.5deg); }
+      80% { transform: translateX(4px) rotate(0.5deg); }
+      90% { transform: translateX(-2px) rotate(0deg); }
+    }
+
+    .calculator.shake {
+      animation: calculatorShake 0.5s steps(8) 1;
+    }
+
+    /* Particle styles */
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #0ff;
+      pointer-events: none;
+      z-index: 100;
+      image-rendering: pixelated;
+    }
+
+    @keyframes particleFly {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0);
+      }
+    }
+
+    /* RGB split effect for glitch */
+    .display-text.rgb-split {
+      animation: rgbSplit 0.2s steps(3) 1;
+    }
+
+    @keyframes rgbSplit {
+      0%, 100% {
+        text-shadow:
+          0 0 10px #0ff,
+          0 0 20px #0ff;
+      }
+      33% {
+        text-shadow:
+          -3px 0 #ff00ff,
+          3px 0 #00ffff,
+          0 0 10px #0ff;
+      }
+      66% {
+        text-shadow:
+          3px 0 #ff00ff,
+          -3px 0 #00ffff,
+          0 0 10px #0ff;
+      }
+    }
+
+    /* Power indicator LED */
+    .power-led {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      width: 8px;
+      height: 8px;
+      background: #0ff;
+      border-radius: 50%;
+      box-shadow:
+        0 0 5px #0ff,
+        0 0 10px #0ff,
+        0 0 15px #00aaaa;
+      animation: ledPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes ledPulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #00aaaa; }
+      50% { opacity: 0.7; box-shadow: 0 0 3px #0ff, 0 0 6px #0ff, 0 0 10px #00aaaa; }
+    }
+
+    /* Solar panel decoration */
+    .solar-panel {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 15px;
+    }
+
+    .solar-cell {
+      width: 30px;
+      height: 12px;
+      background: linear-gradient(180deg, #1a0a3a 0%, #0d0520 50%, #1a0a3a 100%);
+      border-radius: 2px;
+      border: 1px solid rgba(255, 0, 255, 0.2);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Synthwave Sun */
+    .synthwave-sun {
+      position: fixed;
+      bottom: 25%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 100px;
+      border-radius: 100px 100px 0 0;
+      background: linear-gradient(180deg,
+        #ffdd00 0%,
+        #ff9500 25%,
+        #ff5500 50%,
+        #ff0066 75%,
+        #cc0088 100%);
+      overflow: hidden;
+      z-index: 0;
+      animation: sunPulse 4s ease-in-out infinite;
+      box-shadow:
+        0 0 60px rgba(255, 150, 0, 0.5),
+        0 0 120px rgba(255, 100, 0, 0.3),
+        0 0 180px rgba(255, 50, 100, 0.2);
+    }
+
+    /* Sun stripes */
+    .synthwave-sun::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 8px,
+        #1a1a3e 8px,
+        #1a1a3e 12px
+      );
+    }
+
+    @keyframes sunPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 60px rgba(255, 150, 0, 0.5),
+          0 0 120px rgba(255, 100, 0, 0.3),
+          0 0 180px rgba(255, 50, 100, 0.2);
+      }
+      50% {
+        box-shadow:
+          0 0 80px rgba(255, 150, 0, 0.6),
+          0 0 150px rgba(255, 100, 0, 0.4),
+          0 0 220px rgba(255, 50, 100, 0.3);
+      }
+    }
+
+    /* Palm Trees */
+    .palm-tree {
+      position: fixed;
+      bottom: 10%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .palm-tree-left {
+      left: 5%;
+      transform: scaleX(-1);
+    }
+
+    .palm-tree-right {
+      right: 5%;
+    }
+
+    .palm-trunk {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 120px;
+      background: linear-gradient(90deg, #0d0518 0%, #1a0a2e 50%, #0d0518 100%);
+      border-radius: 6px;
+    }
+
+    .palm-trunk::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 8px,
+        rgba(255, 0, 255, 0.1) 8px,
+        rgba(255, 0, 255, 0.1) 10px
+      );
+    }
+
+    .palm-leaves {
+      position: absolute;
+      bottom: 110px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .palm-leaf {
+      position: absolute;
+      width: 80px;
+      height: 20px;
+      background: linear-gradient(90deg, transparent 0%, #0d0518 20%, #0d0518 80%, transparent 100%);
+      border-radius: 50%;
+      transform-origin: left center;
+    }
+
+    .palm-leaf:nth-child(1) { transform: rotate(-70deg) translateX(-10px); }
+    .palm-leaf:nth-child(2) { transform: rotate(-40deg) translateX(-10px); }
+    .palm-leaf:nth-child(3) { transform: rotate(-10deg) translateX(-10px); }
+    .palm-leaf:nth-child(4) { transform: rotate(20deg) translateX(-10px); }
+    .palm-leaf:nth-child(5) { transform: rotate(50deg) translateX(-10px); }
+    .palm-leaf:nth-child(6) { transform: rotate(80deg) translateX(-10px); }
+
+    /* Leaf animation */
+    .palm-tree {
+      animation: palmSway 6s ease-in-out infinite;
+    }
+
+    .palm-tree-left {
+      animation-delay: -3s;
+    }
+
+    @keyframes palmSway {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg); }
+    }
+
+    .palm-tree-left {
+      animation: palmSwayLeft 6s ease-in-out infinite;
+    }
+
+    @keyframes palmSwayLeft {
+      0%, 100% { transform: scaleX(-1) rotate(-2deg); }
+      50% { transform: scaleX(-1) rotate(2deg); }
+    }
+
+    /* Music Player */
+    .music-player {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(13, 5, 24, 0.8);
+      border: 2px solid #ff6ec7;
+      border-radius: 8px;
+      padding: 8px 12px;
+      z-index: 1000;
+      box-shadow: 0 0 15px rgba(255, 110, 199, 0.3);
+    }
+
+    .play-pause-btn {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: 2px solid #0ff;
+      border-radius: 50%;
+      color: #0ff;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-family: 'Press Start 2P', cursive;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+
+    .play-pause-btn:hover {
+      background: rgba(0, 255, 255, 0.1);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    }
+
+    .marquee-container {
+      width: 150px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .marquee-container::before,
+    .marquee-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 20px;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .marquee-container::before {
+      left: 0;
+      background: linear-gradient(90deg, rgba(13, 5, 24, 0.8) 0%, transparent 100%);
+    }
+
+    .marquee-container::after {
+      right: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(13, 5, 24, 0.8) 100%);
+    }
+
+    .song-title {
+      color: #ff6ec7;
+      font-size: 8px;
+      white-space: nowrap;
+      animation: marquee 10s linear infinite;
+      text-shadow: 0 0 5px #ff6ec7;
+      padding-left: 100%;
+    }
+
+    .song-title.paused {
+      animation-play-state: paused;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .volume-icon {
+      color: #a855f7;
+      font-size: 10px;
+      text-shadow: 0 0 5px #a855f7;
+    }
+  </style>
+</head>
+<body>
+  <!-- Synthwave Sun -->
+  <div class="synthwave-sun"></div>
+
+  <!-- Palm Trees -->
+  <div class="palm-tree palm-tree-left">
+    <div class="palm-trunk"></div>
+    <div class="palm-leaves">
+      <div class="palm-leaf"></div>
+      <div class="palm-leaf"></div>
+      <div class="palm-leaf"></div>
+      <div class="palm-leaf"></div>
+      <div class="palm-leaf"></div>
+      <div class="palm-leaf"></div>
+    </div>
+  </div>
+
+  <div class="palm-tree palm-tree-right">
+    <div class="palm-trunk"></div>
+    <div class="palm-leaves">
+      <div class="palm-leaf"></div>
+      <div class="palm-leaf"></div>
+      <div class="palm-leaf"></div>
+      <div class="palm-leaf"></div>
+      <div class="palm-leaf"></div>
+      <div class="palm-leaf"></div>
+    </div>
+  </div>
+
+  <!-- Music Player -->
+  <div class="music-player">
+    <button class="play-pause-btn" id="playPauseBtn">▶</button>
+    <div class="marquee-container">
+      <div class="song-title paused" id="songTitle">♪ Neon Dreams - Synthwave Nights ♪</div>
+    </div>
+    <span class="volume-icon">♫</span>
+  </div>
+
+  <!-- Audio element -->
+  <audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/audio/2022/10/25/audio_946bc4f30b.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="calculator">
+    <div class="power-led"></div>
+    <div class="brand">
+      PIXIO
+      <div class="model">FX-8BIT</div>
+    </div>
+    <div class="solar-panel">
+      <div class="solar-cell"></div>
+      <div class="solar-cell"></div>
+      <div class="solar-cell"></div>
+      <div class="solar-cell"></div>
+      <div class="solar-cell"></div>
+      <div class="solar-cell"></div>
+      <div class="solar-cell"></div>
+    </div>
+    <div class="display-container">
+      <div class="display" id="display">
+        <div class="display-expression" id="expression"></div>
+        <div class="display-text" id="result">0</div>
+      </div>
+    </div>
+    <div class="buttons">
+      <button class="btn btn-clear" data-action="clear">C</button>
+      <button class="btn btn-func" data-action="plusminus">±</button>
+      <button class="btn btn-func" data-action="percent">%</button>
+      <button class="btn btn-op" data-action="divide">÷</button>
+
+      <button class="btn btn-num" data-value="7">7</button>
+      <button class="btn btn-num" data-value="8">8</button>
+      <button class="btn btn-num" data-value="9">9</button>
+      <button class="btn btn-op" data-action="multiply">×</button>
+
+      <button class="btn btn-num" data-value="4">4</button>
+      <button class="btn btn-num" data-value="5">5</button>
+      <button class="btn btn-num" data-value="6">6</button>
+      <button class="btn btn-op" data-action="subtract">−</button>
+
+      <button class="btn btn-num" data-value="1">1</button>
+      <button class="btn btn-num" data-value="2">2</button>
+      <button class="btn btn-num" data-value="3">3</button>
+      <button class="btn btn-op" data-action="add">+</button>
+
+      <button class="btn btn-num btn-zero" data-value="0">0</button>
+      <button class="btn btn-num" data-value=".">.</button>
+      <button class="btn btn-equals" data-action="equals">=</button>
+    </div>
+  </div>
+
+  <script>
+    // Calculator state
+    let currentValue = '0';
+    let previousValue = '';
+    let operation = null;
+    let shouldResetDisplay = false;
+    let expression = '';
+
+    // DOM elements
+    const display = document.getElementById('display');
+    const resultEl = document.getElementById('result');
+    const expressionEl = document.getElementById('expression');
+    const calculatorEl = document.querySelector('.calculator');
+
+    // Initialize with screen-on animation
+    window.addEventListener('load', () => {
+      display.classList.add('screen-on');
+      setTimeout(() => display.classList.remove('screen-on'), 500);
+    });
+
+    // Audio context for beep sounds
+    let audioCtx = null;
+
+    function playBeep(frequency = 800, duration = 50) {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.frequency.value = frequency;
+      oscillator.type = 'square'; // Retro square wave
+
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration / 1000);
+
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + duration / 1000);
+    }
+
+    // Create particle explosion
+    function createParticles(button, color = '#7ec87e') {
+      const rect = button.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const particleCount = 8;
+      const colors = ['#0ff', '#ff00ff', '#ff6ec7', '#a855f7', '#00ffff'];
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = centerX + 'px';
+        particle.style.top = centerY + 'px';
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+        // Random direction
+        const angle = (i / particleCount) * Math.PI * 2 + Math.random() * 0.5;
+        const distance = 30 + Math.random() * 40;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance - 20; // Bias upward
+
+        particle.style.setProperty('--tx', tx + 'px');
+        particle.style.setProperty('--ty', ty + 'px');
+        particle.style.animation = 'particleFly 0.4s steps(4) forwards';
+
+        document.body.appendChild(particle);
+
+        setTimeout(() => particle.remove(), 400);
+      }
+    }
+
+    // Animation triggers
+    function triggerShake() {
+      display.classList.remove('shake');
+      void display.offsetWidth; // Trigger reflow
+      display.classList.add('shake');
+      setTimeout(() => display.classList.remove('shake'), 150);
+    }
+
+    function triggerBounce() {
+      display.classList.remove('bounce');
+      void display.offsetWidth;
+      display.classList.add('bounce');
+      setTimeout(() => display.classList.remove('bounce'), 200);
+    }
+
+    function triggerGlitch() {
+      display.classList.remove('glitch');
+      resultEl.classList.remove('rgb-split');
+      void display.offsetWidth;
+      display.classList.add('glitch');
+      resultEl.classList.add('rgb-split');
+      setTimeout(() => {
+        display.classList.remove('glitch');
+        resultEl.classList.remove('rgb-split');
+      }, 300);
+    }
+
+    function triggerFlicker() {
+      display.classList.remove('flicker');
+      void display.offsetWidth;
+      display.classList.add('flicker');
+      setTimeout(() => display.classList.remove('flicker'), 200);
+    }
+
+    function triggerCalculatorShake() {
+      calculatorEl.classList.remove('shake');
+      void calculatorEl.offsetWidth; // Trigger reflow
+      calculatorEl.classList.add('shake');
+      setTimeout(() => calculatorEl.classList.remove('shake'), 500);
+    }
+
+    // Update display
+    function updateDisplay() {
+      // Format number for display
+      let displayValue = currentValue;
+
+      // Handle very long numbers
+      if (displayValue.length > 12) {
+        const num = parseFloat(displayValue);
+        if (Math.abs(num) >= 1e12 || (Math.abs(num) < 0.0001 && num !== 0)) {
+          displayValue = num.toExponential(5);
+        } else {
+          displayValue = displayValue.substring(0, 12);
+        }
+      }
+
+      resultEl.textContent = displayValue;
+      expressionEl.textContent = expression;
+    }
+
+    // Calculator operations
+    function inputDigit(digit) {
+      if (shouldResetDisplay) {
+        currentValue = digit;
+        shouldResetDisplay = false;
+      } else {
+        if (currentValue === '0' && digit !== '.') {
+          currentValue = digit;
+        } else if (digit === '.' && currentValue.includes('.')) {
+          return; // Don't allow multiple decimals
+        } else {
+          currentValue += digit;
+        }
+      }
+      updateDisplay();
+    }
+
+    function inputOperation(op) {
+      const symbols = {
+        add: '+',
+        subtract: '−',
+        multiply: '×',
+        divide: '÷'
+      };
+
+      if (operation && !shouldResetDisplay) {
+        calculate();
+      }
+
+      previousValue = currentValue;
+      operation = op;
+      expression = `${currentValue} ${symbols[op]}`;
+      shouldResetDisplay = true;
+      updateDisplay();
+    }
+
+    function calculate() {
+      if (!operation || shouldResetDisplay) return;
+
+      const prev = parseFloat(previousValue);
+      const current = parseFloat(currentValue);
+      let result;
+
+      switch (operation) {
+        case 'add':
+          result = prev + current;
+          break;
+        case 'subtract':
+          result = prev - current;
+          break;
+        case 'multiply':
+          result = prev * current;
+          break;
+        case 'divide':
+          if (current === 0) {
+            result = 'ERROR';
+            triggerGlitch();
+            triggerFlicker();
+          } else {
+            result = prev / current;
+          }
+          break;
+      }
+
+      if (result !== 'ERROR') {
+        // Round to avoid floating point issues
+        result = Math.round(result * 1e10) / 1e10;
+        currentValue = result.toString();
+      } else {
+        currentValue = result;
+      }
+
+      expression = '';
+      operation = null;
+      shouldResetDisplay = true;
+      updateDisplay();
+    }
+
+    function clear() {
+      currentValue = '0';
+      previousValue = '';
+      operation = null;
+      expression = '';
+      shouldResetDisplay = false;
+      updateDisplay();
+    }
+
+    function toggleSign() {
+      if (currentValue !== '0' && currentValue !== 'ERROR') {
+        currentValue = (parseFloat(currentValue) * -1).toString();
+        updateDisplay();
+      }
+    }
+
+    function percentage() {
+      if (currentValue !== 'ERROR') {
+        currentValue = (parseFloat(currentValue) / 100).toString();
+        updateDisplay();
+      }
+    }
+
+    // Button click handler
+    document.querySelectorAll('.btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const value = button.dataset.value;
+        const action = button.dataset.action;
+
+        // Play beep
+        playBeep(600 + Math.random() * 400, 30);
+
+        // Always trigger shake on button press
+        triggerShake();
+
+        if (value !== undefined) {
+          // Number or decimal
+          inputDigit(value);
+
+          // Small bounce for numbers
+          if (Math.random() > 0.5) {
+            triggerBounce();
+          }
+        } else if (action) {
+          switch (action) {
+            case 'clear':
+              clear();
+              triggerFlicker();
+              triggerCalculatorShake();
+              createParticles(button);
+              break;
+            case 'plusminus':
+              toggleSign();
+              break;
+            case 'percent':
+              percentage();
+              break;
+            case 'add':
+            case 'subtract':
+            case 'multiply':
+            case 'divide':
+              inputOperation(action);
+              createParticles(button);
+              break;
+            case 'equals':
+              calculate();
+              triggerGlitch();
+              triggerCalculatorShake();
+              createParticles(button);
+              playBeep(1000, 100); // Higher beep for equals
+              break;
+          }
+        }
+      });
+    });
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+      const key = e.key;
+      let button = null;
+
+      if (key >= '0' && key <= '9') {
+        button = document.querySelector(`[data-value="${key}"]`);
+        inputDigit(key);
+      } else if (key === '.') {
+        button = document.querySelector('[data-value="."]');
+        inputDigit('.');
+      } else if (key === '+') {
+        button = document.querySelector('[data-action="add"]');
+        inputOperation('add');
+        createParticles(button);
+      } else if (key === '-') {
+        button = document.querySelector('[data-action="subtract"]');
+        inputOperation('subtract');
+        createParticles(button);
+      } else if (key === '*') {
+        button = document.querySelector('[data-action="multiply"]');
+        inputOperation('multiply');
+        createParticles(button);
+      } else if (key === '/') {
+        e.preventDefault();
+        button = document.querySelector('[data-action="divide"]');
+        inputOperation('divide');
+        createParticles(button);
+      } else if (key === 'Enter' || key === '=') {
+        button = document.querySelector('[data-action="equals"]');
+        calculate();
+        triggerGlitch();
+        triggerCalculatorShake();
+        createParticles(button);
+      } else if (key === 'Escape' || key === 'c' || key === 'C') {
+        button = document.querySelector('[data-action="clear"]');
+        clear();
+        triggerFlicker();
+        triggerCalculatorShake();
+        createParticles(button);
+      } else if (key === '%') {
+        button = document.querySelector('[data-action="percent"]');
+        percentage();
+      }
+
+      if (button) {
+        playBeep(600 + Math.random() * 400, 30);
+        triggerShake();
+        button.classList.add('active');
+        setTimeout(() => button.classList.remove('active'), 100);
+      }
+    });
+
+    // Random occasional flicker for CRT effect
+    setInterval(() => {
+      if (Math.random() > 0.95) {
+        triggerFlicker();
+      }
+    }, 3000);
+
+    // Music Player Controls
+    const bgMusic = document.getElementById('bgMusic');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const songTitle = document.getElementById('songTitle');
+    let isPlaying = false;
+
+    playPauseBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        bgMusic.pause();
+        playPauseBtn.textContent = '▶';
+        songTitle.classList.add('paused');
+        isPlaying = false;
+      } else {
+        bgMusic.play().catch(e => {
+          console.log('Audio play failed:', e);
+        });
+        playPauseBtn.textContent = '❚❚';
+        songTitle.classList.remove('paused');
+        isPlaying = true;
+      }
+    });
+
+    // Update play button if audio ends (even though it loops)
+    bgMusic.addEventListener('ended', () => {
+      playPauseBtn.textContent = '▶';
+      songTitle.classList.add('paused');
+      isPlaying = false;
+    });
+
+    // Handle audio loading errors gracefully
+    bgMusic.addEventListener('error', () => {
+      songTitle.textContent = '♪ No audio loaded ♪';
+    });
+  </script>
+</body>
+</html>
