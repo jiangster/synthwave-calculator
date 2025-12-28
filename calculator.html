@@ -78,7 +78,7 @@
       transform: perspective(200px) rotateX(60deg);
       transform-origin: bottom;
       pointer-events: none;
-      z-index: 0;
+      z-index: -1;
     }
 
     @keyframes twinkle {
@@ -783,6 +783,145 @@
       font-size: 10px;
       text-shadow: 0 0 5px #a855f7;
     }
+
+    /* Mobile Responsive Styles */
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+
+    @media (max-width: 480px) {
+      /* Center music player at top */
+      .music-player {
+        top: 10px;
+        right: 50%;
+        transform: translateX(50%);
+        padding: 6px 10px;
+        gap: 8px;
+      }
+
+      .marquee-container {
+        width: 120px;
+      }
+
+      .song-title {
+        font-size: 6px;
+      }
+
+      .play-pause-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+      }
+
+      /* Scale calculator for mobile */
+      .calculator {
+        padding: 15px;
+        border-radius: 15px;
+        margin: 60px 10px 20px;
+        max-width: calc(100vw - 20px);
+      }
+
+      .display {
+        width: 100%;
+        min-width: 220px;
+        max-width: 260px;
+        height: 70px;
+        padding: 12px 15px;
+      }
+
+      .display-container {
+        margin-bottom: 15px;
+      }
+
+      .display-text {
+        font-size: 22px;
+        width: 100%;
+      }
+
+      .display-expression {
+        font-size: 10px;
+      }
+
+      .buttons {
+        gap: 8px;
+      }
+
+      .btn {
+        padding: 14px 8px;
+        font-size: 12px;
+        border-radius: 5px;
+      }
+
+      .brand {
+        font-size: 7px;
+        margin-bottom: 10px;
+      }
+
+      .model {
+        font-size: 5px;
+      }
+
+      .solar-panel {
+        margin-bottom: 10px;
+      }
+
+      .solar-cell {
+        width: 24px;
+        height: 10px;
+      }
+
+      .power-led {
+        top: 15px;
+        right: 15px;
+        width: 6px;
+        height: 6px;
+      }
+
+      /* Hide palm trees on mobile */
+      .palm-tree {
+        display: none;
+      }
+
+      /* Smaller sun on mobile */
+      .synthwave-sun {
+        width: 150px;
+        height: 75px;
+        bottom: 20%;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .calculator {
+        padding: 12px;
+      }
+
+      .display {
+        min-width: 200px;
+        height: 60px;
+      }
+
+      .display-text {
+        font-size: 18px;
+      }
+
+      .btn {
+        padding: 12px 6px;
+        font-size: 10px;
+      }
+
+      .buttons {
+        gap: 6px;
+      }
+
+      .music-player {
+        padding: 5px 8px;
+      }
+
+      .marquee-container {
+        width: 100px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -823,10 +962,6 @@
     <span class="volume-icon">♫</span>
   </div>
 
-  <!-- Audio element -->
-  <audio id="bgMusic" loop>
-    <source src="https://cdn.pixabay.com/audio/2022/10/25/audio_946bc4f30b.mp3" type="audio/mpeg">
-  </audio>
 
   <div class="calculator">
     <div class="power-led"></div>
@@ -1226,38 +1361,122 @@
       }
     }, 3000);
 
-    // Music Player Controls
-    const bgMusic = document.getElementById('bgMusic');
+    // Synthwave Music Synthesizer using Web Audio API
     const playPauseBtn = document.getElementById('playPauseBtn');
     const songTitle = document.getElementById('songTitle');
     let isPlaying = false;
+    let synthAudioCtx = null;
+    let masterGain = null;
+    let synthNodes = [];
+    let arpInterval = null;
+
+    // Synthwave chord progression (Am - F - C - G)
+    const chords = [
+      [220, 261.63, 329.63], // Am
+      [174.61, 220, 261.63], // F
+      [261.63, 329.63, 392], // C
+      [196, 246.94, 293.66]  // G
+    ];
+
+    // Arpeggio notes
+    const arpNotes = [440, 523.25, 659.25, 783.99, 659.25, 523.25];
+
+    function createSynthMusic() {
+      if (!synthAudioCtx) {
+        synthAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      masterGain = synthAudioCtx.createGain();
+      masterGain.gain.value = 0.15;
+      masterGain.connect(synthAudioCtx.destination);
+
+      // Bass synth
+      const bassOsc = synthAudioCtx.createOscillator();
+      const bassGain = synthAudioCtx.createGain();
+      const bassFilter = synthAudioCtx.createBiquadFilter();
+      bassOsc.type = 'sawtooth';
+      bassOsc.frequency.value = 55;
+      bassFilter.type = 'lowpass';
+      bassFilter.frequency.value = 200;
+      bassGain.gain.value = 0.3;
+      bassOsc.connect(bassFilter);
+      bassFilter.connect(bassGain);
+      bassGain.connect(masterGain);
+      bassOsc.start();
+      synthNodes.push(bassOsc);
+
+      // Pad synth (detuned saws for that synthwave sound)
+      const padOscs = [];
+      for (let i = 0; i < 3; i++) {
+        const osc = synthAudioCtx.createOscillator();
+        const gain = synthAudioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.value = chords[0][i];
+        osc.detune.value = (Math.random() - 0.5) * 20;
+        gain.gain.value = 0.08;
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.start();
+        padOscs.push({ osc, gain });
+        synthNodes.push(osc);
+      }
+
+      // Chord progression
+      let chordIndex = 0;
+      setInterval(() => {
+        chordIndex = (chordIndex + 1) % chords.length;
+        const chord = chords[chordIndex];
+        padOscs.forEach((p, i) => {
+          p.osc.frequency.setTargetAtTime(chord[i], synthAudioCtx.currentTime, 0.1);
+        });
+        // Update bass
+        bassOsc.frequency.setTargetAtTime(chord[0] / 4, synthAudioCtx.currentTime, 0.1);
+      }, 2000);
+
+      // Arpeggiator
+      let arpIndex = 0;
+      arpInterval = setInterval(() => {
+        const arpOsc = synthAudioCtx.createOscillator();
+        const arpGain = synthAudioCtx.createGain();
+        arpOsc.type = 'square';
+        arpOsc.frequency.value = arpNotes[arpIndex];
+        arpGain.gain.setValueAtTime(0.06, synthAudioCtx.currentTime);
+        arpGain.gain.exponentialRampToValueAtTime(0.001, synthAudioCtx.currentTime + 0.2);
+        arpOsc.connect(arpGain);
+        arpGain.connect(masterGain);
+        arpOsc.start();
+        arpOsc.stop(synthAudioCtx.currentTime + 0.25);
+        arpIndex = (arpIndex + 1) % arpNotes.length;
+      }, 180);
+    }
+
+    function stopSynthMusic() {
+      synthNodes.forEach(node => {
+        try { node.stop(); } catch(e) {}
+      });
+      synthNodes = [];
+      if (arpInterval) {
+        clearInterval(arpInterval);
+        arpInterval = null;
+      }
+      if (synthAudioCtx) {
+        synthAudioCtx.close();
+        synthAudioCtx = null;
+      }
+    }
 
     playPauseBtn.addEventListener('click', () => {
       if (isPlaying) {
-        bgMusic.pause();
+        stopSynthMusic();
         playPauseBtn.textContent = '▶';
         songTitle.classList.add('paused');
         isPlaying = false;
       } else {
-        bgMusic.play().catch(e => {
-          console.log('Audio play failed:', e);
-        });
+        createSynthMusic();
         playPauseBtn.textContent = '❚❚';
         songTitle.classList.remove('paused');
         isPlaying = true;
       }
-    });
-
-    // Update play button if audio ends (even though it loops)
-    bgMusic.addEventListener('ended', () => {
-      playPauseBtn.textContent = '▶';
-      songTitle.classList.add('paused');
-      isPlaying = false;
-    });
-
-    // Handle audio loading errors gracefully
-    bgMusic.addEventListener('error', () => {
-      songTitle.textContent = '♪ No audio loaded ♪';
     });
   </script>
 </body>
